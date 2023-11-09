@@ -74,6 +74,7 @@ public class App extends Application {
             String emails = frw.readFile(f_emails, StandardCharsets.UTF_8),
                    content = frw.readFile(f_content, StandardCharsets.UTF_8);
 
+            /*
             String op1 = txt_op1.getText();
             String op2 = txt_op2.getText();
             if(op1.charAt(0) != '+' || op1.charAt(0) != '-') {
@@ -98,6 +99,7 @@ public class App extends Application {
                 case "/":
                     wrk.div(op1, op2);
             }
+            */
 
             String data = wrk.read();/*
             if (NumberUtils.isParsable(data)) {
