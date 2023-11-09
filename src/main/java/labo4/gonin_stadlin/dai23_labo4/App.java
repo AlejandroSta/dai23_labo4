@@ -13,6 +13,7 @@ import labo4.gonin_stadlin.dai23_labo4.helpers.Popups;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class App extends Application {
     final String SERVER_ADDRESS = "localhost";
@@ -61,6 +62,17 @@ public class App extends Application {
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream());) {
             Worker wrk = new Worker(out, in);
+
+            FileReaderWriter frw = new FileReaderWriter();
+
+            File f_emails = new File("../../../../../../emails.txt"),
+                 f_content = new File("../../../../../../content.txt");
+
+            if(!f_emails.exists() || f_emails.isDirectory() || !f_emails.canRead() ||
+               !f_content.exists() || f_content.isDirectory() || !f_content.canRead()) throw new RuntimeException();
+
+            String emails = frw.readFile(f_emails, StandardCharsets.UTF_8),
+                   content = frw.readFile(f_content, StandardCharsets.UTF_8);
 
             String op1 = txt_op1.getText();
             String op2 = txt_op2.getText();
