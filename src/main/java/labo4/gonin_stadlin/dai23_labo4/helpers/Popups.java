@@ -3,7 +3,10 @@ package labo4.gonin_stadlin.dai23_labo4.helpers;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
@@ -12,7 +15,7 @@ import java.util.Optional;
  * JavaFx popups handler, inspired by <a href="https://code.makery.ch/blog/javafx-dialogs-official/">https://code.makery.ch/blog/javafx-dialogs-official/</a>
  *
  * @author Guillaume Gonin
- * @version 1.0
+ * @version 1.5
  * @since 04.11.2023
  */
 public class Popups {
@@ -49,6 +52,46 @@ public class Popups {
         dialog.setContentText(text);
 
         Optional<String> result = dialog.showAndWait();
+        return result.get();
+    }
+
+    /**
+     * Popup with a button open who ask to choose a file and then return it
+     *
+     * @param title  the title of the window
+     * @param header the content of the header (if null, no header handled)
+     * @return the File object chosen
+     */
+    public static File askFile(String title, String header) {
+        Dialog<File> dialog = new Dialog<>();
+        File file = null;
+
+        // Set the button types.
+        ButtonType openButtonType = new ButtonType("Open", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(openButtonType);
+
+
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+
+        // Get the Stage.
+        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == openButtonType) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Open File");
+                return fileChooser.showOpenDialog(stage);
+            }
+            return null;
+        });
+
+        Optional<File> result = dialog.showAndWait();
+
+
+
+
+
         return result.get();
     }
 
