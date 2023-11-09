@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="ap_main" minHeight="450.0" minWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="labo4.gonin_stadlin.dai23_labo4.App">
+
+    <TabPane fx:id="tp" layoutY="-6.0" prefHeight="327.0" prefWidth="346.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+        <tabs>
+            <Tab fx:id="t_home" text="Home">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <Button layoutX="256.0" layoutY="165.0" onAction="#onConnectButtonClick" prefHeight="33.0" prefWidth="101.0" text="Connect" AnchorPane.leftAnchor="256.0" AnchorPane.rightAnchor="243.0" AnchorPane.topAnchor="165.0" />
+                    </AnchorPane>
+                </content>
+            </Tab>
+            <Tab fx:id="t_calculate" disable="true" text="Calculate">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <GridPane layoutX="94.0" layoutY="66.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="247.0" minWidth="10.0" prefWidth="247.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="419.0" minWidth="10.0" prefWidth="184.0" />
+                           <ColumnConstraints maxWidth="566.0" minWidth="169.0" prefWidth="169.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                <children>
+                           <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
+                              <children>
+                                 <TextField fx:id="txt_op1" layoutX="28.0" layoutY="54.0" prefHeight="25.0" prefWidth="98.0" />
+                                 <Label layoutX="28.0" layoutY="37.0" text="Operator 1:" />
+                                 <ComboBox fx:id="cbx_op" layoutX="168.0" layoutY="54.0" prefHeight="25.0" minWidth="50.0" />
+                              </children>
+                           </AnchorPane>
+                           <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <children>
+                                 <TextField fx:id="txt_op2" layoutX="7.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" />
+                                 <Label layoutX="10.0" layoutY="35.0" text="Operator 2:" />
+                              </children>
+                           </AnchorPane>
+                           <Button mnemonicParsing="false" onAction="#run" text="Calculate" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                           <Label fx:id="l_result" text="Result : " GridPane.columnIndex="1" GridPane.rowIndex="2" minWidth="200"/>
+                                </children>
+                            </GridPane>
+                        </children>
+                    </AnchorPane>
+                </content>
+            </Tab>
+        </tabs>
+    </TabPane>
+</AnchorPane>
