@@ -73,6 +73,8 @@ public class App extends Application {
 
             String emails = frw.readFile(f_emails, StandardCharsets.UTF_8),
                    content = frw.readFile(f_content, StandardCharsets.UTF_8);
+            String[] emails_array = emails.split("\n"), content_array = content.split("END\n");
+
 
             /*
             String op1 = txt_op1.getText();
