@@ -9,13 +9,14 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Optional;
 
 /**
  * JavaFx popups handler, inspired by <a href="https://code.makery.ch/blog/javafx-dialogs-official/">https://code.makery.ch/blog/javafx-dialogs-official/</a>
  *
  * @author Guillaume Gonin
- * @version 1.5
+ * @version 1.7
  * @since 04.11.2023
  */
 public class Popups {
@@ -38,6 +39,25 @@ public class Popups {
     }
 
     /**
+     * Popup with a list of input handling
+     *
+     * @param title  the title of the window
+     * @param header the content of the header (if null, no header handled)
+     * @param text   the content
+     * @param values the values that the list will take (the first one is selected)
+     * @return the selected element chosen by the user or null
+     */
+    public static <T> T askElInAList(String title, String header, String text, ArrayList<T> values) {
+        ChoiceDialog<T> dialog = new ChoiceDialog<>(values.get(0), values);
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+        dialog.setContentText(text);
+
+        Optional<T> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
+    /**
      * Popup with a text input handling
      *
      * @param title  the title of the window
@@ -52,7 +72,7 @@ public class Popups {
         dialog.setContentText(text);
 
         Optional<String> result = dialog.showAndWait();
-        return result.get();
+        return result.orElse(null);
     }
 
     /**
@@ -60,7 +80,7 @@ public class Popups {
      *
      * @param title  the title of the window
      * @param header the content of the header (if null, no header handled)
-     * @return the File object chosen
+     * @return the File object chosen or null
      */
     public static File askFile(String title, String header) {
         Dialog<File> dialog = new Dialog<>();
@@ -92,7 +112,7 @@ public class Popups {
 
 
 
-        return result.get();
+        return result.orElse(null);
     }
 
     /**
@@ -111,7 +131,7 @@ public class Popups {
         dialog.setContentText(text);
 
         Optional<String> result = dialog.showAndWait();
-        return result.get();
+        return result.orElse(null);
     }
 
     /**

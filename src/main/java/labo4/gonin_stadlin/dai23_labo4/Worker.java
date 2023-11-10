@@ -2,17 +2,63 @@ package labo4.gonin_stadlin.dai23_labo4;
 
 //import org.apache.commons.lang3.math.NumberUtils;
 
+import labo4.gonin_stadlin.dai23_labo4.helpers.Popups;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.Socket;
+
+import static labo4.gonin_stadlin.dai23_labo4.helpers.Constances.*;
 
 public class Worker {
-    private final PrintWriter out;
-    private final BufferedReader in;
+    private final String srvAddr;
+    private final int srvPort;
 
-    public Worker(PrintWriter out, BufferedReader in) {
-        this.out = out;
-        this.in = in;
+    private Socket socket;
+    private PrintWriter out;
+    private BufferedReader in;
+
+    public Worker() throws RuntimeException {
+        this(SERVER_ADDRESS, SERVER_PORT);
+    }
+    public Worker(String srvAddr, int srvPort) throws RuntimeException {
+        this.srvAddr = srvAddr;
+        this.srvPort = srvPort;
+
+        try {
+            connect();
+            //TODO call hello, or another test method to the server to validate the connection
+            disconnect();
+        } catch (IOException ex) {
+            if (isConnected())
+                try { disconnect(); } catch (IOException e) { socket = null; in = null; out = null; }//nothing else to do than hope garbage collector will destroy it soon
+            Popups.error("Error happened", MSG_EXPRESSION_HANDLER + ex);
+            throw new RuntimeException();
+        }
+    }
+
+    private void connect() throws IOException {
+            socket = new Socket(srvAddr, srvPort);
+
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream());
+    }
+
+    private void disconnect() throws IOException {
+        in.close();
+        in = null;
+        out.flush();
+        out.close();
+        out = null;
+
+        socket.close();
+        socket = null;
+    }
+
+    private boolean isConnected() {
+        return socket != null && in != null && out != null;
     }
 
     void add(String x, String y) {
