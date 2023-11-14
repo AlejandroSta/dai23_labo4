@@ -9,7 +9,7 @@ import java.util.Collection;
  * Java file manager doing standards operations
  *
  * @author Guillaume Gonin
- * @version 2.4
+ * @version 2.5
  * @since 30.02.2020
  */
 public class FileManager {
@@ -57,6 +57,15 @@ public class FileManager {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Method that return the extension of the file
+     *
+     * @return the extension of the file
+     */
+    public String getExtension() {
+        return extension;
     }
 
     /**
@@ -154,10 +163,9 @@ public class FileManager {
      *
      * @param value              the object to write (if not a String, write the .toString, except on a .obj file where it will write the object itself)
      * @param writeInExistedFile if true append at the end of the file, else at the beginning
-     * @return true if it succeeded to write
      * @throws MyFileException when an error append throw this one instead
      */
-    public <T> boolean add(T value, boolean writeInExistedFile) throws MyFileException {
+    public <T> void add(T value, boolean writeInExistedFile) throws MyFileException {
         if (extension.equals("obj")) {
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(stringFile, writeInExistedFile))) {
                 if (value != null)
@@ -165,7 +173,6 @@ public class FileManager {
             } catch (IOException ex) {
                 throw new MyFileException("FileManager.add()\n" + ex.getMessage(), false);
             }
-            return true;
         } else if (binary) {
             try (DataOutputStream out = new DataOutputStream(
                     new BufferedOutputStream(
@@ -173,7 +180,6 @@ public class FileManager {
                 if (value != null) {
                     out.writeUTF(value.toString());
                 }
-                return true;
             } catch (FileNotFoundException ex) {
                 throw new MyFileException("FileManager.add()\n" + ex.getMessage(), true);
             } catch (IOException ex) {
@@ -186,7 +192,6 @@ public class FileManager {
                 if (value != null) {
                     pw.println(value);
                 }
-                return true;
             } catch (FileNotFoundException ex) {
                 throw new MyFileException("FileManager.add()\n" + ex.getMessage(), true);
             }
@@ -198,10 +203,9 @@ public class FileManager {
      *
      * @param values             the object to write (if not a String, write the .toString, except on a .obj file where it will write the object itself)
      * @param writeInExistedFile if true append at the end of the file, else at the beginning
-     * @return true if it succeeded to write
      * @throws MyFileException when an error append throw this one instead
      */
-    public <T> boolean addAll(Collection<T> values, boolean writeInExistedFile) throws MyFileException {
+    public <T> void addAll(Collection<T> values, boolean writeInExistedFile) throws MyFileException {
         if (extension.equals("obj")) {
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(stringFile, writeInExistedFile))) {
                 if (values != null) {
@@ -227,8 +231,6 @@ public class FileManager {
                 } else {
                     throw new MyFileException("FileManager.addAll\n Values is null, can't write children.", false);
                 }
-
-                return true;
             } catch (FileNotFoundException ex) {
                 throw new MyFileException("FileManager.addAll()\n" + ex.getMessage(), true);
             } catch (IOException ex) {
@@ -250,7 +252,6 @@ public class FileManager {
                 throw new MyFileException("FileManager.addAll()\n" + ex.getMessage(), true);
             }
         }
-        return true;
     }
 
     /**
@@ -363,20 +364,22 @@ public class FileManager {
     }
 
     /**
-     * Method that read n object from the file
+     * Method that read n object from the line o file
      *
+     * @param o offset (will read the line number o as if it was the first line)
+     * @param n number of object to read (at max)
      * @return an ArrayList of n object (or less) ridden from the file
      * @throws MyFileException when an error append throw this one instead
      */
-    public <T> ArrayList<T> reads(int n) throws MyFileException {
+    public <T> ArrayList<T> reads(int o, int n) throws MyFileException {
         ArrayList<T> values = new ArrayList<>();
         if (extension.equals("obj")) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(stringFile));) {
                 Object line;
                 int i = 0;
-                while ((line = objectInputStream.readObject()) != null && i < n) {
-                    values.add((T) line);
-                    ++i;
+                while ((line = objectInputStream.readObject()) != null && values.size() < n) {
+                    if (i >= o) values.add((T) line);
+                    else ++i;
                 }
             } catch (IOException | ClassNotFoundException ex) {
                 throw new MyFileException("FileManager.reads()\n" + ex.getMessage(), true);
@@ -391,9 +394,9 @@ public class FileManager {
                 }
                 DataInputStream dis = new DataInputStream(fis);
                 int i = 0;
-                while (fis.available() > 0 && i < n) {
-                    values.add((T) dis.readUTF());
-                    i++;
+                while (fis.available() > 0 && values.size() < n) {
+                    if (i >= o) values.add((T) dis.readUTF());
+                    else i++;
                 }
             } catch (IOException ex) {
                 throw new MyFileException("FileManager.reads()\n" + ex.getMessage(), true);
@@ -405,8 +408,8 @@ public class FileManager {
                 String line;
                 int i = 0;
                 while ((line = br.readLine()) != null && i < n) {
-                    values.add((T) line);
-                    ++i;
+                    if (i >= o) values.add((T) line);
+                    else ++i;
                 }
             } catch (FileNotFoundException ex) {
                 throw new MyFileException("FileManager.reads()\n" + ex.getMessage(), true);
@@ -416,6 +419,17 @@ public class FileManager {
         }
 
         return values;
+    }
+
+    /**
+     * Method that read n object from the beginning of the file
+     *
+     * @param n number of object to read (at max)
+     * @return an ArrayList of n object (or less) ridden from the file
+     * @throws MyFileException when an error append throw this one instead
+     */
+    public <T> ArrayList<T> reads(int n) throws MyFileException {
+        return reads(0, n);
     }
 
     /**
@@ -472,83 +486,15 @@ public class FileManager {
      * Method who (try to) delete the file
      *
      * @return true if the file doesn't exist
+     * @throws MyFileException if a SecurityException append
      */
-    public boolean delete() {
-        File file = new File(stringFile);
-        file.delete();
-        return !file.exists();
-    }
-
-    public static boolean createFile(String stringFile) throws MyFileException {
+    public boolean delete() throws MyFileException {
         File file = new File(stringFile);
         try {
-            file.createNewFile();
-        } catch (IOException ex) {
-            throw new MyFileException("FileManager.create\n" + ex.getMessage(), false);
+            file.delete();
+        } catch (SecurityException ex) {
+            throw new MyFileException("FileManager.delete()\n" + ex.getMessage(), true);
         }
-        return file.exists();
-    }
-
-    public static boolean cleanFile(String stringFile) throws MyFileException {
-
-        try (PrintWriter pw = new PrintWriter(stringFile, StandardCharsets.UTF_8)) {
-            return true;
-        } catch (FileNotFoundException ex) {
-            throw new MyFileException("FileManager.cleanFile\n" + ex.getMessage(), true);
-        } catch (IOException ex) {
-            throw new MyFileException("FileManager.cleanFile\n" + ex.getMessage(), false);
-        }
-    }
-
-    public static boolean writeDatas(String stringFile, ArrayList<String> values, boolean writeInExistedFile) throws MyFileException {
-
-        try (PrintWriter pw = new PrintWriter(
-                new OutputStreamWriter(
-                        new FileOutputStream(stringFile, writeInExistedFile), StandardCharsets.UTF_8));) {
-            for (String value : values) {
-                pw.println(value);
-            }
-            return true;
-        } catch (FileNotFoundException ex) {
-            throw new MyFileException("FileManager.writeDatas\n" + ex.getMessage(), true);
-        }
-    }
-
-    public static boolean writeData(String stringFile, String value, boolean writeInExistedFile) throws MyFileException {
-
-        try (PrintWriter pw = new PrintWriter(
-                new OutputStreamWriter(
-                        new FileOutputStream(stringFile, writeInExistedFile), StandardCharsets.UTF_8));) {
-            pw.println(value);
-            return true;
-        } catch (FileNotFoundException ex) {
-            throw new MyFileException("FileManager.writeData\n" + ex.getMessage(), true);
-        }
-    }
-
-    public static ArrayList<String> readFile(String stringFile) throws MyFileException {
-
-        ArrayList<String> values = null;
-
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(stringFile),
-                        StandardCharsets.UTF_8))) {
-            values = new ArrayList<>();
-            String line;
-            while ((line = br.readLine()) != null) {
-                values.add(line);
-            }
-        } catch (FileNotFoundException ex) {
-            throw new MyFileException("FileManager.readFile\n" + ex.getMessage(), true);
-        } catch (IOException ex) {
-            throw new MyFileException("FileManager.readFile\n" + ex.getMessage(), false);
-        }
-        return values;
-    }
-
-    public static boolean deleteFile(String stringFile) {
-        File file = new File(stringFile);
-        file.delete();
-        return file.exists();
+        return !file.exists();
     }
 }
