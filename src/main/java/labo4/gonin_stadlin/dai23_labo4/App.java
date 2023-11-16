@@ -87,39 +87,11 @@ public class App extends Application {
             Popups.error("Error append", "Impossible to connect to the server.");
         }
 
-        /*
-        String op1 = txt_op1.getText();
-        String op2 = txt_op2.getText();
-        if (op1.charAt(0) != '+' || op1.charAt(0) != '-') {
-            op1 = '+' + op1;
-        }
-        if (op2.charAt(0) != '+' || op2.charAt(0) != '-') {
-            op2 = '+' + op2;
-        }
-
-        switch (cbx_op.getSelectionModel().getSelectedItem()) {
-            default:
-                return;
-            case "+":
-                wrk.add(op1, op2);
-                break;
-            case "-":
-                wrk.sub(op1, op2);
-                break;
-            case "*":
-                wrk.mul(op1, op2);
-                break;
-            case "/":
-                wrk.div(op1, op2);
-        }
-
-
-        String data = wrk.read();
-        if (NumberUtils.isParsable(data)) {
-            l_result.setText("Result : " + data);
+        if (socketManager != null && socketManager.sendSpam(victims, messages, nbGroups)) {
+            Popups.info("Spam done !", "It seems that it works. The spams should be send and received soon.");
         } else {
-            Popups.warn("Something went wrong !", MSG_EXPRESSION_HANDLER + data);
-        }*/
+            Popups.warn("Something went wrong !", "It's seems that something went wrong on the sending of spam. May check all is alright or try again.");
+        }
     }
 
     @FXML

@@ -77,9 +77,10 @@ public class SocketManager {
         return "not a number : The result is not parsable";
     }
 
-    void sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
+    boolean sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
         out.println("ADD " + victims.size() + " " + nbGroups);
         out.flush();
+        return false;
     }
 
     private String errnumString(int errnum) {
