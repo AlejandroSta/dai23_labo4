@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import labo4.gonin_stadlin.dai23_labo4.helpers.FileManager;
+import labo4.gonin_stadlin.dai23_labo4.helpers.MyFileException;
 import labo4.gonin_stadlin.dai23_labo4.helpers.Popups;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -63,6 +65,11 @@ public class App extends Application {
 
     @FXML
     private TextArea txa_message;
+
+    private File fVictims, fMessages;
+    private ArrayList<String> victims, messages;
+
+    private Integer nbGroups;
 
     //onButtonClick functs
     @FXML
@@ -120,27 +127,35 @@ public class App extends Application {
     }
 
     @FXML
-    public void onConfigButtonClick(ActionEvent actionEvent) {
+    public void onConfigButtonClick(ActionEvent actionEvent){
         //victims
-        File fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.");
+        fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.");
         if (!validateFile(fVictims)) {
             Popups.error("Something went wrong !", "The file indicated seems invalid, please retry");
             return;
         }
 
-        ArrayList<String> victims = fileToList(fVictims);
+        try {
+            victims = fileToList(fVictims);
+        } catch (MyFileException e) {
+            Popups.error("Erreur", "Il y a eu une erreur lors de la lecture du fichier de la liste des victimes");
+        }
 
         //Messages
-        File fMessages = Popups.askFile("Messages list", "Indicate the file containing the list of subjects and body to send.");
+        fMessages = Popups.askFile("Messages list", "Indicate the file containing the list of subjects and body to send.");
         if (!validateFile(fMessages)) {
             Popups.error("Something went wrong !", "The file indicated seems invalid, please retry");
             return;
         }
 
-        ArrayList<String> messages = fileToList(fMessages);
+        try {
+            messages = fileToList(fMessages);
+        } catch (MyFileException e) {
+            Popups.error("Erreur", "Il y a eu une erreur lors de la lecture du fichier du contenu du mail");
+        }
 
         //nbOfGroups
-        Integer nbGroups = Popups.askElInAList("Choose numbers of groups.", "Choose the number of groups you needs.", "One groups is composed of 2 to 5 victims who one is the sender of the email and the others the recievers.",
+        nbGroups = Popups.askElInAList("Choose numbers of groups.", "Choose the number of groups you needs.", "One groups is composed of 2 to 5 victims who one is the sender of the email and the others the recievers.",
                 new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)));
         if (nbGroups == null) {
             Popups.error("Something went wrong !", "The value got seems invalid, please retry");
@@ -175,8 +190,8 @@ public class App extends Application {
      * @param fileToConvert the file to convert
      * @return the data on an ArrayList or null
      */
-    private ArrayList<String> fileToList(File fileToConvert) {
-        return null; //TODO
+    private ArrayList<String> fileToList(File fileToConvert) throws MyFileException {
+        return new FileManager(fileToConvert.getAbsolutePath()).readAll(); //TODO
     }
 
     /**
