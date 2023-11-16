@@ -9,7 +9,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import labo4.gonin_stadlin.dai23_labo4.helpers.Popups;
-//import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class App extends Application {
     //constants and attributes
 
-    private Worker wrk;
+    private SocketManager socketManager;
 
 
     //APP implementation
@@ -28,11 +28,6 @@ public class App extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Hello!");
-        try {
-            wrk = new Worker();
-        } catch (RuntimeException ex) {
-            Popups.warn("Warn", "No connection with the server.");
-        }
         //scene.getStylesheets().add(URL_CSS_SHEET);
 
         stage.setScene(scene);
@@ -72,58 +67,56 @@ public class App extends Application {
     //onButtonClick functs
     @FXML
     private void onSendButtonClick() {
-            //TODO or adapt
-            /*
-            wrk = new Worker();
+        //TODO or adapt
+        String serverIp = Popups.askText("Server IP", "Give the server IP", "Give the server IP to which you want to connect to send this.");
+        String serverPort = Popups.askText("Server Port", "Give the server port", "Give the server port to which you want to connect to send this.");
 
-            FileReaderWriter frw = new FileReaderWriter();
+        if (!NumberUtils.isParsable(serverPort)) {
+            return;
+        }
 
-            File f_emails = new File("../../../../../../emails.txt"),
-                 f_content = new File("../../../../../../content.txt");
+        int port = Integer.parseInt(serverPort);
 
-            if(!f_emails.exists() || f_emails.isDirectory() || !f_emails.canRead() ||
-               !f_content.exists() || f_content.isDirectory() || !f_content.canRead()) throw new RuntimeException();
+        try {
+            socketManager = new SocketManager(serverIp, port);
 
-            String emails = frw.readFile(f_emails, StandardCharsets.UTF_8),
-                   content = frw.readFile(f_content, StandardCharsets.UTF_8);
-            String[] emails_array = emails.split("\n"), content_array = content.split("END\n");
+        } catch (RuntimeException ex) {
+            Popups.error("Error append", "Impossible to connect to the server.");
+        }
 
+        /*
+        String op1 = txt_op1.getText();
+        String op2 = txt_op2.getText();
+        if (op1.charAt(0) != '+' || op1.charAt(0) != '-') {
+            op1 = '+' + op1;
+        }
+        if (op2.charAt(0) != '+' || op2.charAt(0) != '-') {
+            op2 = '+' + op2;
+        }
 
-            /*
-            String op1 = txt_op1.getText();
-            String op2 = txt_op2.getText();
-            if(op1.charAt(0) != '+' || op1.charAt(0) != '-') {
-                op1 = '+' + op1;
-            }
-            if(op2.charAt(0) != '+' || op2.charAt(0) != '-') {
-                op2 = '+' + op2;
-            }
-
-            switch (cbx_op.getSelectionModel().getSelectedItem()) {
-                default:
-                    return;
-                case "+":
-                    wrk.add(op1, op2);
-                    break;
-                case "-":
-                    wrk.sub(op1, op2);
-                    break;
-                case "*":
-                    wrk.mul(op1, op2);
-                    break;
-                case "/":
-                    wrk.div(op1, op2);
-            }
-            */
-
-            /*String data = wrk.read();
-            if (NumberUtils.isParsable(data)) {
-                l_result.setText("Result : " + data);
-            } else {
-                Popups.warn("Something went wrong !", MSG_EXPRESSION_HANDLER + data);
-            }*/
+        switch (cbx_op.getSelectionModel().getSelectedItem()) {
+            default:
+                return;
+            case "+":
+                wrk.add(op1, op2);
+                break;
+            case "-":
+                wrk.sub(op1, op2);
+                break;
+            case "*":
+                wrk.mul(op1, op2);
+                break;
+            case "/":
+                wrk.div(op1, op2);
+        }
 
 
+        String data = wrk.read();
+        if (NumberUtils.isParsable(data)) {
+            l_result.setText("Result : " + data);
+        } else {
+            Popups.warn("Something went wrong !", MSG_EXPRESSION_HANDLER + data);
+        }*/
     }
 
     @FXML
@@ -189,7 +182,7 @@ public class App extends Application {
     /**
      * Method that set the contents of UI of the tab prepare (the ListViews, the events, the labels, ...)
      *
-     * @param victims the list of victims got to display
+     * @param victims  the list of victims got to display
      * @param messages the list of messages got to display
      * @param nbGroups the number of groups chosen by the user
      */

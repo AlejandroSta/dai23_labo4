@@ -22,7 +22,7 @@
                     </AnchorPane>
                 </content>
             </Tab>
-            <Tab fx:id="t_prepare" disable="true" text="prepare">
+            <Tab fx:id="t_prepare" disable="true" text="Prepare">
                 <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                         <children>

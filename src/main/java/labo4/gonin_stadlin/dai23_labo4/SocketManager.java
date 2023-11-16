@@ -1,9 +1,8 @@
 package labo4.gonin_stadlin.dai23_labo4;
 
-//import org.apache.commons.lang3.math.NumberUtils;
-
 import labo4.gonin_stadlin.dai23_labo4.helpers.Popups;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,7 +11,7 @@ import java.net.Socket;
 
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Constances.*;
 
-public class Worker {
+public class SocketManager {
     private final String srvAddr;
     private final int srvPort;
 
@@ -20,10 +19,7 @@ public class Worker {
     private PrintWriter out;
     private BufferedReader in;
 
-    public Worker() throws RuntimeException {
-        this(SERVER_ADDRESS, SERVER_PORT);
-    }
-    public Worker(String srvAddr, int srvPort) throws RuntimeException {
+    public SocketManager(String srvAddr, int srvPort) throws RuntimeException {
         this.srvAddr = srvAddr;
         this.srvPort = srvPort;
 
@@ -33,17 +29,23 @@ public class Worker {
             disconnect();
         } catch (IOException ex) {
             if (isConnected())
-                try { disconnect(); } catch (IOException e) { socket = null; in = null; out = null; }//nothing else to do than hope garbage collector will destroy it soon
+                try {
+                    disconnect();
+                } catch (IOException e) {
+                    socket = null;
+                    in = null;
+                    out = null;
+                }//nothing else to do than hope garbage collector will destroy it soon
             Popups.error("Error happened", MSG_EXPRESSION_HANDLER + ex);
             throw new RuntimeException();
         }
     }
 
     private void connect() throws IOException {
-            socket = new Socket(srvAddr, srvPort);
+        socket = new Socket(srvAddr, srvPort);
 
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream());
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        out = new PrintWriter(socket.getOutputStream());
     }
 
     private void disconnect() throws IOException {
@@ -87,9 +89,9 @@ public class Worker {
             if (data.split(" ")[0].equals("INVALID")) {
                 return errnumString(Integer.parseInt(data.split(" ")[1]));
             }
-            /*if (NumberUtils.isParsable(data)) {
+            if (NumberUtils.isParsable(data)) {
                 return data;
-            }*/
+            }
         }
         return "not a number : The result is not parsable";
     }
