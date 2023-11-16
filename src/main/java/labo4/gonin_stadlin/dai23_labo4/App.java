@@ -18,10 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class App extends Application {
-    //constants and attributes
-
-    private SocketManager socketManager;
-
 
     //APP implementation
     @Override
@@ -83,10 +79,10 @@ public class App extends Application {
         }
 
         int port = Integer.parseInt(serverPort);
+        SocketManager socketManager = null;
 
         try {
             socketManager = new SocketManager(serverIp, port);
-
         } catch (RuntimeException ex) {
             Popups.error("Error append", "Impossible to connect to the server.");
         }

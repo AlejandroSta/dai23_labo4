@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Constances.*;
 
@@ -63,26 +64,6 @@ public class SocketManager {
         return socket != null && in != null && out != null;
     }
 
-    void add(String x, String y) {
-        out.println("ADD " + x + " " + y);
-        out.flush();
-    }
-
-    void sub(String x, String y) {
-        out.println("SUB " + x + " " + y);
-        out.flush();
-    }
-
-    void mul(String x, String y) {
-        out.println("MUL " + x + " " + y);
-        out.flush();
-    }
-
-    void div(String x, String y) {
-        out.println("DIV " + x + " " + y);
-        out.flush();
-    }
-
     String read() throws IOException {
         String data;
         if ((data = in.readLine()) != null) {
@@ -94,6 +75,11 @@ public class SocketManager {
             }
         }
         return "not a number : The result is not parsable";
+    }
+
+    void sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
+        out.println("ADD " + victims.size() + " " + nbGroups);
+        out.flush();
     }
 
     private String errnumString(int errnum) {
