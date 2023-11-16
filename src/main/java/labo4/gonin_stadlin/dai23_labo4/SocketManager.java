@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Constances.*;
 
@@ -81,6 +83,36 @@ public class SocketManager {
         out.println("ADD " + victims.size() + " " + nbGroups);
         out.flush();
         return false;
+    }
+
+    boolean sendMail(ArrayList<String> vicims, String content){
+        try {
+            connect();
+            out.println("ehlo " + srvAddr);
+            out.flush();
+            out.println("mail from:<" + vicims.get(0) + ">");
+            out.flush();
+            for(int i = 1; i < vicims.size(); ++i){
+                out.println("rcpt to: <" + vicims.get(i) + ">");
+                out.flush();
+            }
+            out.println("data");
+            out.flush();
+            out.println("From: <shakira@music.com>");
+            StringBuilder to = new StringBuilder().append("To: ");
+            for(int i = 1; i < vicims.size(); ++i){
+                to.append("<").append(vicims.get(i)).append(">,");
+            }
+            to.setLength(to.length() - 1);
+            out.println(to);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM dd, yyyy");
+            out.println("Date : " + dtf.format(LocalDateTime.now()));
+            out.flush();
+            disconnect();
+        }catch (IOException e){
+            return false;
+        }
+        return true;
     }
 
     private String errnumString(int errnum) {

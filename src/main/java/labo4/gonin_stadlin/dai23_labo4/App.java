@@ -106,7 +106,7 @@ public class App extends Application {
         try {
             victims = fileToList(fVictims);
         } catch (MyFileException e) {
-            Popups.error("Erreur", "Il y a eu une erreur lors de la lecture du fichier de la liste des victimes");
+            Popups.error("Error", "An error occurred while reading the victims email list file");
         }
 
         //Messages
@@ -119,7 +119,7 @@ public class App extends Application {
         try {
             messages = fileToList(fMessages);
         } catch (MyFileException e) {
-            Popups.error("Erreur", "Il y a eu une erreur lors de la lecture du fichier du contenu du mail");
+            Popups.error("Error", "An error occurred while reading the emails content file");
         }
 
         //nbOfGroups
