@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Constants.*;
 
@@ -80,12 +81,13 @@ public class SocketManager {
     }
 
     boolean sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
-        out.println("ADD " + victims.size() + " " + nbGroups);
-        out.flush();
+        for(int i = 0; i < Math.max(Math.max(nbGroups, victims.size()), messages.size()); ++i){
+            if (!sendMail(List.of(victims.get(i).split(", ")), messages.get(i))) break;
+        }
         return false;
     }
 
-    boolean sendMail(ArrayList<String> vicims, String content){
+    boolean sendMail(List<String> vicims, String content){
         try {
             connect();
             out.println("ehlo " + srvAddr + RN);
@@ -121,7 +123,7 @@ public class SocketManager {
             out.flush();
             out.println(content + RN);
             out.flush();
-            out.println(RN + RN);
+            out.println(RN + "." + RN);
             out.flush();
             disconnect();
         }catch (IOException e){
