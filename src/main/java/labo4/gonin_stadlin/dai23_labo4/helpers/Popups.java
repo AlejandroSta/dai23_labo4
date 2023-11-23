@@ -10,13 +10,14 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 /**
  * JavaFx popups handler, inspired by <a href="https://code.makery.ch/blog/javafx-dialogs-official/">https://code.makery.ch/blog/javafx-dialogs-official/</a>
  *
  * @author Guillaume Gonin
- * @version 1.7
+ * @version 1.8
  * @since 04.11.2023
  */
 public class Popups {
@@ -58,24 +59,6 @@ public class Popups {
     }
 
     /**
-     * Popup with a text input handling
-     *
-     * @param title  the title of the window
-     * @param header the content of the header (if null, no header handled)
-     * @param text   the content
-     * @return the content of the text input after pressed OK button
-     */
-    public static String askText(String title, String header, String text) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(title);
-        dialog.setHeaderText(header);
-        dialog.setContentText(text);
-
-        Optional<String> result = dialog.showAndWait();
-        return result.orElse(null);
-    }
-
-    /**
      * Popup with a button open who ask to choose a file and then return it
      *
      * @param title  the title of the window
@@ -83,6 +66,22 @@ public class Popups {
      * @return the File object chosen or null
      */
     public static File askFile(String title, String header) {
+        return askFile(title, header, null);
+    }
+
+    /**
+     * Popup with a button open who ask to choose a file and then return it
+     *
+     * @param title   the title of the window
+     * @param header  the content of the header (if null, no header handled)
+     * @param options customise the file window.
+     *                ["Title"] set a custom title (must be a String)
+     *                ["Initial File Name"] set a custom title (must be a String)
+     *                ["Initial Directory"] set a custom title (must be a File)
+     *                ["Selected Extension Filter"] set a custom extension filter (must be a FileChooser.ExtensionFilter)
+     * @return the File object chosen or placeholder
+     */
+    public static File askFile(String title, String header, HashMap<String, Object> options) {
         Dialog<File> dialog = new Dialog<>();
         File file = null;
 
@@ -100,7 +99,16 @@ public class Popups {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == openButtonType) {
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open File");
+                if (options != null && options.containsKey("Title") && options.get("Title") instanceof String)
+                    fileChooser.setTitle((String) options.get("Title"));
+                else
+                    fileChooser.setTitle("Open File");
+                if (options != null && options.containsKey("Initial File Name") && options.get("Initial File Name") instanceof String)
+                    fileChooser.setInitialFileName((String) options.get("Initial File Name"));
+                if (options != null && options.containsKey("Initial Directory") && options.get("Initial Directory") instanceof File)
+                    fileChooser.setInitialDirectory((File) options.get("Initial Directory"));
+                if (options != null && options.containsKey("Selected Extension Filter") && options.get("Selected Extension Filter") instanceof FileChooser.ExtensionFilter)
+                    fileChooser.setSelectedExtensionFilter((FileChooser.ExtensionFilter) options.get("Selected Extension Filter"));
                 return fileChooser.showOpenDialog(stage);
             }
             return null;
@@ -109,10 +117,20 @@ public class Popups {
         Optional<File> result = dialog.showAndWait();
 
 
-
-
-
         return result.orElse(null);
+    }
+
+
+    /**
+     * Popup with a text input handling
+     *
+     * @param title  the title of the window
+     * @param header the content of the header (if null, no header handled)
+     * @param text   the content
+     * @return the content of the text input after pressed OK button
+     */
+    public static String askText(String title, String header, String text) {
+        return askText(title, header, text, null);
     }
 
     /**
@@ -122,10 +140,13 @@ public class Popups {
      * @param header      the content of the header (if null, no header handled)
      * @param text        the content
      * @param placeholder initial content of the text input
-     * @return the content of the text input after pressed OK button
+     * @return the content of the text input after pressed OK button or null
      */
     public static String askText(String title, String header, String text, String placeholder) {
-        TextInputDialog dialog = new TextInputDialog(placeholder);
+        TextInputDialog dialog = placeholder == null
+                ? new TextInputDialog()
+                : new TextInputDialog(placeholder);
+
         dialog.setTitle(title);
         dialog.setHeaderText(header);
         dialog.setContentText(text);

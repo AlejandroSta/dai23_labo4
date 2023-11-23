@@ -16,6 +16,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class App extends Application {
 
@@ -95,9 +96,18 @@ public class App extends Application {
     }
 
     @FXML
-    public void onConfigButtonClick(ActionEvent actionEvent){
+    public void onConfigButtonClick(ActionEvent actionEvent) {
         //victims
-        fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.");
+        File directory = new File(System.getProperty("user.home") + "\\Docments\\");
+        HashMap<String, Object> options = new HashMap<>();
+        options.put("Title", "Victims list file");
+        //options.put("Initial File Name", /*directory.getAbsolutePath()+"\\*/"README.txt"); seems not to work
+        if (directory.exists())
+            options.put("Initial Directory", directory);
+        options.put("Selected Extension Filter", "My Custom Title"); //TO TEST
+
+        fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.", options);
+        if (fVictims == null) Popups.info("null", "null returned");
         if (!validateFile(fVictims)) {
             Popups.error("Something went wrong !", "The file indicated seems invalid, please retry");
             return;
