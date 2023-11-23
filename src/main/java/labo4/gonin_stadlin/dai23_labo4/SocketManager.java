@@ -121,7 +121,7 @@ public class SocketManager {
             out.flush();
             out.println(content + RN);
             out.flush();
-            out.println(RN + RN);
+            out.println(RN + "." + RN);
             out.flush();
             disconnect();
         }catch (IOException e){
