@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import labo4.gonin_stadlin.dai23_labo4.helpers.FileManager;
@@ -17,6 +18,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class App extends Application {
 
@@ -98,13 +100,18 @@ public class App extends Application {
     @FXML
     public void onConfigButtonClick(ActionEvent actionEvent) {
         //victims
-        File directory = new File(System.getProperty("user.home") + "\\Docments\\");
+        File directory = new File(System.getProperty("user.home") + "\\Documents\\");
         HashMap<String, Object> options = new HashMap<>();
         options.put("Title", "Victims list file");
         //options.put("Initial File Name", /*directory.getAbsolutePath()+"\\*/"README.txt"); seems not to work
         if (directory.exists())
             options.put("Initial Directory", directory);
-        options.put("Selected Extension Filter", "My Custom Title"); //TO TEST
+        List<FileChooser.ExtensionFilter> extensionsFilter = Arrays.asList(new FileChooser.ExtensionFilter("Text Files", "*.txt", "*.docx", "*.xmlx", "*.doc", "*.xml", "*.pdf"),
+                new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png", "*.gif", "*.jpeg"),
+                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv", "*.mts"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        options.put("Extension Filter List", extensionsFilter);
+        options.put("Selected Extension Filter", 3);
 
         fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.", options);
         if (fVictims == null) Popups.info("null", "null returned");

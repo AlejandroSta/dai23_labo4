@@ -9,9 +9,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * JavaFx popups handler, inspired by <a href="https://code.makery.ch/blog/javafx-dialogs-official/">https://code.makery.ch/blog/javafx-dialogs-official/</a>
@@ -107,8 +105,15 @@ public class Popups {
                     fileChooser.setInitialFileName((String) options.get("Initial File Name"));
                 if (options != null && options.containsKey("Initial Directory") && options.get("Initial Directory") instanceof File)
                     fileChooser.setInitialDirectory((File) options.get("Initial Directory"));
-                if (options != null && options.containsKey("Selected Extension Filter") && options.get("Selected Extension Filter") instanceof FileChooser.ExtensionFilter)
-                    fileChooser.setSelectedExtensionFilter((FileChooser.ExtensionFilter) options.get("Selected Extension Filter"));
+                if (options != null && options.containsKey("Extension Filter List") && options.get("Extension Filter List") instanceof Collection<?>) {
+                    for (Object e : (Collection<?>) options.get("Extension Filter List")) {
+                        if (e instanceof FileChooser.ExtensionFilter)
+                            fileChooser.getExtensionFilters().add((FileChooser.ExtensionFilter) e);
+                    }
+
+                    if (options.containsKey("Selected Extension Filter") && options.get("Selected Extension Filter") instanceof Integer)
+                        fileChooser.setSelectedExtensionFilter(fileChooser.getExtensionFilters().get((Integer) options.get("Selected Extension Filter")));
+                }
                 return fileChooser.showOpenDialog(stage);
             }
             return null;
