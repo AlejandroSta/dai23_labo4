@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
-import static labo4.gonin_stadlin.dai23_labo4.helpers.Constances.*;
+import static labo4.gonin_stadlin.dai23_labo4.helpers.Constants.*;
 
 public class SocketManager {
     private final String srvAddr;
@@ -88,25 +88,40 @@ public class SocketManager {
     boolean sendMail(ArrayList<String> vicims, String content){
         try {
             connect();
-            out.println("ehlo " + srvAddr);
+            out.println("ehlo " + srvAddr + RN);
             out.flush();
-            out.println("mail from:<" + vicims.get(0) + ">");
+            out.println("mail from:<" + vicims.get(0) + ">" + RN);
             out.flush();
             for(int i = 1; i < vicims.size(); ++i){
-                out.println("rcpt to: <" + vicims.get(i) + ">");
+                out.println("rcpt to: <" + vicims.get(i) + ">" + RN);
                 out.flush();
             }
-            out.println("data");
+            out.println("data" + RN);
             out.flush();
-            out.println("From: <shakira@music.com>");
+            out.println("From: <shakira@music.com>" + RN);
             StringBuilder to = new StringBuilder().append("To: ");
             for(int i = 1; i < vicims.size(); ++i){
                 to.append("<").append(vicims.get(i)).append(">,");
             }
             to.setLength(to.length() - 1);
-            out.println(to);
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM dd, yyyy");
-            out.println("Date : " + dtf.format(LocalDateTime.now()));
+            out.println(to + RN);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+            int day = Integer.parseInt(dtf.format(LocalDateTime.now()).substring(5, 7));
+            String daySuffix = switch(day % 10){
+                case 1 -> (day == 11 ? "th" : "st");
+                case 2 -> (day == 12 ? "th" : "nd");
+                case 3 -> (day == 13 ? "th" : "rd");
+                default -> "th";
+            };
+            out.println("Date : " + dtf.format(LocalDateTime.now()).replace(",", daySuffix + ",") + RN);
+            out.flush();
+            out.println("Subject: April Joke" + RN);
+            out.flush();
+            out.println(RN);
+            out.flush();
+            out.println(content + RN);
+            out.flush();
+            out.println(RN + RN);
             out.flush();
             disconnect();
         }catch (IOException e){
