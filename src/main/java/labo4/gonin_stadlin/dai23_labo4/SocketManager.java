@@ -81,8 +81,8 @@ public class SocketManager {
     }
 
     boolean sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
-        for(int i = 0; i < Math.max(Math.max(nbGroups, victims.size() / 5), messages.size()); ++i){
-            if (!sendMail(victims.subList(5 * i, 5 * (i + 1)), messages.get(i))) break;
+        for(int i = 0; i < Math.max(Math.max(nbGroups, victims.size()), messages.size()); ++i){
+            if (!sendMail(List.of(victims.get(i).split(", ")), messages.get(i))) break;
         }
         return false;
     }
