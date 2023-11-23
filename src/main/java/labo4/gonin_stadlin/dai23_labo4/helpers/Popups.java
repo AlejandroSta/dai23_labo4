@@ -15,10 +15,24 @@ import java.util.*;
  * JavaFx popups handler, inspired by <a href="https://code.makery.ch/blog/javafx-dialogs-official/">https://code.makery.ch/blog/javafx-dialogs-official/</a>
  *
  * @author Guillaume Gonin
- * @version 1.8
+ * @version 1.9
  * @since 04.11.2023
  */
 public class Popups {
+    /**
+     * Extension filter list proposed (contain a default "All Files", "Test Files", "Image Files", "Video Files")
+     */
+    public final static List<FileChooser.ExtensionFilter> EXTENSION_FILTER_LIST = Arrays.asList(
+            new FileChooser.ExtensionFilter("All Files", "*.*"),
+            new FileChooser.ExtensionFilter("Text Files", "*.txt", "*.md", "*.xmlx", "*.html", "*.xml", "*.csv"),
+            new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png", "*.gif", "*.jpeg"),
+            new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv", "*.mts"));
+
+    /**
+     * User home directory
+     */
+    public final static File USER_HOME = new File(System.getProperty("user.home"));
+
     /**
      * Popup with an ok/cancel button handling
      *
@@ -68,15 +82,31 @@ public class Popups {
     }
 
     /**
+     * get option hashmap easily for ask file
+     *
+     * @param title   the title set a custom title
+     * @param directory  set a custom directory opened with the window
+     * @param extensionsFilter a custom extension filter list
+     * @param SelectedExtensionFilter the index of the extensionFilter to be selected by default
+     *
+     * @return the File object chosen or placeholder
+     */
+    public static HashMap<String, Object> getOptions(String title, File directory, Collection<FileChooser.ExtensionFilter> extensionsFilter, Integer SelectedExtensionFilter) {
+        HashMap<String, Object> options = new HashMap<>();
+        options.put("Title", title);
+        if (directory.exists())
+            options.put("Initial Directory", directory);
+        options.put("Extension Filter List", extensionsFilter);
+        options.put("Selected Extension Filter", SelectedExtensionFilter);
+        return options;
+    }
+
+    /**
      * Popup with a button open who ask to choose a file and then return it
      *
      * @param title   the title of the window
      * @param header  the content of the header (if null, no header handled)
-     * @param options customise the file window.
-     *                ["Title"] set a custom title (must be a String)
-     *                ["Initial File Name"] set a custom title (must be a String)
-     *                ["Initial Directory"] set a custom title (must be a File)
-     *                ["Selected Extension Filter"] set a custom extension filter (must be a FileChooser.ExtensionFilter)
+     * @param options customise the file window. See getOptions() documentation.
      * @return the File object chosen or placeholder
      */
     public static File askFile(String title, String header, HashMap<String, Object> options) {
