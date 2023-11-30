@@ -216,7 +216,7 @@ public class App extends Application {
      * @return the data on an ArrayList or null
      */
     private ArrayList<String> fileToList(File fileToConvert) throws MyFileException {
-        return new FileManager(fileToConvert.getAbsolutePath()).readAll(); //TODO
+        return new FileManager(fileToConvert.getAbsolutePath()).readAll();
     }
 
     /**
