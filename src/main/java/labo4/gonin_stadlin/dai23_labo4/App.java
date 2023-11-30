@@ -104,7 +104,7 @@ public class App extends Application {
                 getOptions("Victims list file", directory, EXTENSION_FILTER_LIST.subList(0, 2), 1));
 
         if (fVictims == null) Popups.info("null", "null returned");
-        if (!validateFile(fVictims)) {
+        if (!validateVictims(fVictims)) {
             Popups.error("Something went wrong !", "The file indicated seems invalid, please retry");
             return;
         }
@@ -118,7 +118,7 @@ public class App extends Application {
         //Messages
         File fMessages = Popups.askFile("Messages list", "Indicate the file containing the list of subjects and body to send.",
                 getOptions("Messages list file", directory, EXTENSION_FILTER_LIST.subList(0, 2), 1));
-        if (!validateFile(fMessages)) {
+        if (!validateMessages(fMessages)) {
             Popups.error("Something went wrong !", "The file indicated seems invalid, please retry");
             return;
         }
@@ -144,17 +144,68 @@ public class App extends Application {
         tp.getSelectionModel().select(t_prepare);
     }
 
-
-
     /**
-     * Method that allow use to test if a file is valid
-     * NB: may move it to file manager, may split it in validateVictims, validateMessages. TO SEE
+     * Method that allow use to test if a victims file is valid (an email per line (email need to contain one and only one @ and at least one '.' after the @)
      *
      * @param fileToValidate the file to validate
      * @return true if valid, else false
      */
-    private boolean validateFile(File fileToValidate) {
-        return fileToValidate != null;
+    private boolean validateVictims(File fileToValidate) {
+        if (fileToValidate == null) return false;
+        boolean isValid = true;
+
+        try {
+            FileManager fm = new FileManager(fileToValidate.getAbsolutePath());
+
+            boolean isEmailsFileEmpty = true;
+            ArrayList<String> line;
+            int i = 0;
+            while (!(line = fm.reads(i, 1)).isEmpty() && isValid){
+                isEmailsFileEmpty = false;
+                i++;
+
+                String[] at = line.get(0).split("@");
+                if (at.length != 2){
+                    isValid = false;
+                    break;
+                }
+
+                String[] point = at[1].split("\\.");
+                if (point.length < 2) isValid = false;
+            }
+
+            return !isEmailsFileEmpty && isValid;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+    /**
+     * Method that allow use to test if a messages file is valid (subject first line, then body, then empty line and so on)
+     *
+     * @param fileToValidate the file to validate
+     * @return true if valid, else false
+     */
+    private boolean validateMessages(File fileToValidate) {
+        if (fileToValidate == null) return false;
+        boolean isValid = true;
+
+        try {
+            FileManager fm = new FileManager(fileToValidate.getAbsolutePath());
+
+            int i = 0;
+            ArrayList<String> message;
+            while (!(message = fm.reads(i, 3)).isEmpty() && isValid){
+                i += 3;
+                String subject = message.get(0);
+                String body = message.size() > 1 ? message.get(1) : null;
+                String emptyLine = message.size() > 2 ? message.get(2) : null;
+
+                if (subject == null || body == null || emptyLine == null || !emptyLine.isEmpty()) isValid = false;
+            }
+            return isValid;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     /**
