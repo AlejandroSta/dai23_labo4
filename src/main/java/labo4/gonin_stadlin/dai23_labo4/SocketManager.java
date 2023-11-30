@@ -82,9 +82,9 @@ public class SocketManager {
 
     boolean sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
         for(int i = 0; i < Math.max(Math.max(nbGroups, victims.size()), messages.size()); ++i){
-            if (!sendMail(List.of(victims.get(i).split(", ")), messages.get(i))) break;
+            if (!sendMail(List.of(victims.get(i).split(", ")), messages.get(i))) return false;
         }
-        return false;
+        return true;
     }
 
     boolean sendMail(List<String> vicims, String content){
@@ -108,7 +108,7 @@ public class SocketManager {
             to.setLength(to.length() - 1);
             out.println(to + RN);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
-            int day = Integer.parseInt(dtf.format(LocalDateTime.now()).substring(5, 7));
+            int day = Integer.parseInt(DateTimeFormatter.ofPattern("dd").format(LocalDateTime.now()));
             String daySuffix = switch(day % 10){
                 case 1 -> (day == 11 ? "th" : "st");
                 case 2 -> (day == 12 ? "th" : "nd");
