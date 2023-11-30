@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import labo4.gonin_stadlin.dai23_labo4.helpers.FileManager;
@@ -17,8 +16,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+
+import static labo4.gonin_stadlin.dai23_labo4.helpers.Popups.getOptions;
+import static labo4.gonin_stadlin.dai23_labo4.helpers.Popups.EXTENSION_FILTER_LIST;
+import static labo4.gonin_stadlin.dai23_labo4.helpers.Popups.USER_HOME;
 
 public class App extends Application {
 
@@ -100,20 +101,11 @@ public class App extends Application {
     @FXML
     public void onConfigButtonClick(ActionEvent actionEvent) {
         //victims
-        File directory = new File(System.getProperty("user.home") + "\\Documents\\");
-        HashMap<String, Object> options = new HashMap<>();
-        options.put("Title", "Victims list file");
-        //options.put("Initial File Name", /*directory.getAbsolutePath()+"\\*/"README.txt"); seems not to work
-        if (directory.exists())
-            options.put("Initial Directory", directory);
-        List<FileChooser.ExtensionFilter> extensionsFilter = Arrays.asList(new FileChooser.ExtensionFilter("Text Files", "*.txt", "*.docx", "*.xmlx", "*.doc", "*.xml", "*.pdf"),
-                new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png", "*.gif", "*.jpeg"),
-                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv", "*.mts"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
-        options.put("Extension Filter List", extensionsFilter);
-        options.put("Selected Extension Filter", 3);
+        File directory = new File(USER_HOME.getAbsolutePath() + "\\Documents\\");
 
-        fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.", options);
+        fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.",
+                getOptions("Victims list file", directory, EXTENSION_FILTER_LIST.subList(0, 2),1));
+
         if (fVictims == null) Popups.info("null", "null returned");
         if (!validateFile(fVictims)) {
             Popups.error("Something went wrong !", "The file indicated seems invalid, please retry");
@@ -127,7 +119,8 @@ public class App extends Application {
         }
 
         //Messages
-        fMessages = Popups.askFile("Messages list", "Indicate the file containing the list of subjects and body to send.");
+        fMessages = Popups.askFile("Messages list", "Indicate the file containing the list of subjects and body to send.",
+                getOptions("Messages list file", directory, EXTENSION_FILTER_LIST.subList(0, 2),1));
         if (!validateFile(fMessages)) {
             Popups.error("Something went wrong !", "The file indicated seems invalid, please retry");
             return;
@@ -156,6 +149,8 @@ public class App extends Application {
         t_prepare.setDisable(false);
         tp.getSelectionModel().select(t_prepare);
     }
+
+
 
     /**
      * Method that allow use to test if a file is valid
