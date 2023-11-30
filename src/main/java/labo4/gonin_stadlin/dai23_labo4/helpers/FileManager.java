@@ -9,7 +9,7 @@ import java.util.Collection;
  * Java file manager doing standards operations
  *
  * @author Guillaume Gonin
- * @version 2.5
+ * @version 2.6
  * @since 30.02.2020
  */
 public class FileManager {
@@ -407,9 +407,9 @@ public class FileManager {
                             StandardCharsets.UTF_8))) {
                 String line;
                 int i = 0;
-                while ((line = br.readLine()) != null && i < n) {
+                while ((line = br.readLine()) != null && i < o+n) {
                     if (i >= o) values.add((T) line);
-                    else ++i;
+                    ++i;
                 }
             } catch (FileNotFoundException ex) {
                 throw new MyFileException("FileManager.reads()\n" + ex.getMessage(), true);
