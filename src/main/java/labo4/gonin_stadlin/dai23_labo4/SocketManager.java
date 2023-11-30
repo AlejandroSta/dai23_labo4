@@ -81,29 +81,39 @@ public class SocketManager {
     }
 
     boolean sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
-        for(int i = 0; i < Math.max(Math.max(nbGroups, victims.size()), messages.size()); ++i){
-            if (!sendMail(List.of(victims.get(i).split(", ")), messages.get(i))) return false;
+        if(victims.size() == 1) return false;
+        int groupSize = victims.size() / nbGroups;
+        if(groupSize < 2){
+            Popups.warn("Mauvais ratio nombre d'emails / nombre de groupes", "Le nombre d'emails donnés est trop petit comparé au nombre de groupes demandés (il faut au minimum deux emails par groupe)");
+            boolean c = Popups.ask("Continuer ?", "Voulez-vous continuer ?", "Nous pouvons réduire le nombre de groupes automatiquement si vous le souhaitez");
+            if(!c) return false;
+        }
+        while(groupSize < 2){
+            groupSize = victims.size() / (--nbGroups);
+        }
+        for(int i = 0; i < nbGroups; ++i){
+            if (!sendMail(victims.subList(i * groupSize, (i + 1) * groupSize), messages.get(i))) return false;
         }
         return true;
     }
 
-    boolean sendMail(List<String> vicims, String content){
+    boolean sendMail(List<String> victims, String content){
         try {
             connect();
             out.println("ehlo " + srvAddr + RN);
             out.flush();
-            out.println("mail from:<" + vicims.get(0) + ">" + RN);
+            out.println("mail from:<" + victims.get(0) + ">" + RN);
             out.flush();
-            for(int i = 1; i < vicims.size(); ++i){
-                out.println("rcpt to: <" + vicims.get(i) + ">" + RN);
+            for(int i = 1; i < victims.size(); ++i){
+                out.println("rcpt to: <" + victims.get(i) + ">" + RN);
                 out.flush();
             }
             out.println("data" + RN);
             out.flush();
             out.println("From: <shakira@music.com>" + RN);
             StringBuilder to = new StringBuilder().append("To: ");
-            for(int i = 1; i < vicims.size(); ++i){
-                to.append("<").append(vicims.get(i)).append(">,");
+            for(int i = 1; i < victims.size(); ++i){
+                to.append("<").append(victims.get(i)).append(">,");
             }
             to.setLength(to.length() - 1);
             out.println(to + RN);
