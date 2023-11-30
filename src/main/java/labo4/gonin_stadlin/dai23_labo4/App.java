@@ -17,6 +17,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static labo4.gonin_stadlin.dai23_labo4.helpers.Constants.APP_TITLE;
+import static labo4.gonin_stadlin.dai23_labo4.helpers.Constants.FXML_PATH;
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Popups.getOptions;
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Popups.EXTENSION_FILTER_LIST;
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Popups.USER_HOME;
@@ -26,10 +28,10 @@ public class App extends Application {
     //APP implementation
     @Override
     public void start(Stage stage) throws IOException {
-        System.out.println(App.class.getResource("view.fxml"));
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("view.fxml"));
+        System.out.println(App.class.getResource(FXML_PATH));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(FXML_PATH));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Hello!");
+        stage.setTitle(APP_TITLE);
         //scene.getStylesheets().add(URL_CSS_SHEET);
 
         stage.setScene(scene);
