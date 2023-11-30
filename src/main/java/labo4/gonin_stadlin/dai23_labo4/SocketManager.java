@@ -67,17 +67,17 @@ public class SocketManager {
         return socket != null && in != null && out != null;
     }
 
-    String read() throws IOException {
+    boolean isReadFine(){
         String data;
-        if ((data = in.readLine()) != null) {
-            if (data.split(" ")[0].equals("INVALID")) {
-                return errnumString(Integer.parseInt(data.split(" ")[1]));
+        do {
+            try {
+                data = in.readLine();
+                if(data.charAt(0) != '2') return false;
+            }catch(IOException e){
+                return false;
             }
-            if (NumberUtils.isParsable(data)) {
-                return data;
-            }
-        }
-        return "not a number : The result is not parsable";
+        }while(data.charAt(3) != ' ');
+        return true;
     }
 
     boolean sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
@@ -100,23 +100,28 @@ public class SocketManager {
     boolean sendMail(List<String> victims, String content){
         try {
             connect();
-            out.println("ehlo " + srvAddr + RN);
+            if(!isReadFine()) return false;
+            out.println("ehlo " + srvAddr);
             out.flush();
-            out.println("mail from:<" + victims.get(0) + ">" + RN);
+            if(!isReadFine()) return false;
+            out.println("mail from:<" + victims.get(0) + ">");
             out.flush();
+            if(!isReadFine()) return false;
             for(int i = 1; i < victims.size(); ++i){
-                out.println("rcpt to: <" + victims.get(i) + ">" + RN);
+                out.println("rcpt to: <" + victims.get(i) + ">");
                 out.flush();
+                if(!isReadFine()) return false;
             }
-            out.println("data" + RN);
+            out.println("data");
             out.flush();
-            out.println("From: <shakira@music.com>" + RN);
+            if(in.readLine().charAt(0) != '3') return false;
+            out.println("From: <shakira@music.com>");
             StringBuilder to = new StringBuilder().append("To: ");
             for(int i = 1; i < victims.size(); ++i){
                 to.append("<").append(victims.get(i)).append(">,");
             }
             to.setLength(to.length() - 1);
-            out.println(to + RN);
+            out.println(to);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
             int day = Integer.parseInt(DateTimeFormatter.ofPattern("dd").format(LocalDateTime.now()));
             String daySuffix = switch(day % 10){
@@ -125,16 +130,18 @@ public class SocketManager {
                 case 3 -> (day == 13 ? "th" : "rd");
                 default -> "th";
             };
-            out.println("Date : " + dtf.format(LocalDateTime.now()).replace(",", daySuffix + ",") + RN);
+            out.println("Date : " + dtf.format(LocalDateTime.now()).replace(",", daySuffix + ","));
             out.flush();
             out.println("Subject: April Joke" + RN);
             out.flush();
-            out.println(RN);
+            out.println(content);
             out.flush();
-            out.println(content + RN);
+            out.println(RN + ".");
             out.flush();
-            out.println(RN + "." + RN);
+            if(!isReadFine()) return false;
+            out.println("quit");
             out.flush();
+            if(!isReadFine()) return false;
             disconnect();
         }catch (IOException e){
             return false;
