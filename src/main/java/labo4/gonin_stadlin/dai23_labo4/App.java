@@ -110,7 +110,7 @@ public class App extends Application {
         }
 
         try {
-            victims = fileToList(fVictims);
+            victims = readEmails(fVictims);
         } catch (MyFileException e) {
             Popups.error("Error", "An error occurred while reading the victims email list file");
         }
@@ -160,12 +160,12 @@ public class App extends Application {
             boolean isEmailsFileEmpty = true;
             ArrayList<String> line;
             int i = 0;
-            while (!(line = fm.reads(i, 1)).isEmpty() && isValid){
+            while (!(line = fm.reads(i, 1)).isEmpty() && isValid) {
                 isEmailsFileEmpty = false;
                 i++;
 
                 String[] at = line.get(0).split("@");
-                if (at.length != 2){
+                if (at.length != 2) {
                     isValid = false;
                     break;
                 }
@@ -179,6 +179,7 @@ public class App extends Application {
             return false;
         }
     }
+
     /**
      * Method that allow use to test if a messages file is valid (subject first line, then body, then empty line and so on)
      *
@@ -194,7 +195,7 @@ public class App extends Application {
 
             int i = 0;
             ArrayList<String> message;
-            while (!(message = fm.reads(i, 3)).isEmpty() && isValid){
+            while (!(message = fm.reads(i, 3)).isEmpty() && isValid) {
                 i += 3;
                 String subject = message.get(0);
                 String body = message.size() > 1 ? message.get(1) : null;
@@ -209,14 +210,44 @@ public class App extends Application {
     }
 
     /**
-     * Method that return the content of the file into an ArrayList
-     * NB: Probably move it to file manager
+     * Method that return the content of the messages file into an ArrayList
      *
      * @param fileToConvert the file to convert
      * @return the data on an ArrayList or null
      */
-    private ArrayList<String> fileToList(File fileToConvert) throws MyFileException {
-        return new FileManager(fileToConvert.getAbsolutePath()).readAll();
+    private ArrayList<String> readMessages(File fileToConvert) {
+        ArrayList<String> message = new ArrayList<>();
+        try {
+            FileManager fm = new FileManager(fileToConvert.getAbsolutePath());
+
+            int i = 0;
+            ArrayList<String> lines;
+            while (!(lines = fm.reads(i, 2)).isEmpty()) {
+                i += 3;
+                message.addAll(lines);
+            }
+
+            if (message.isEmpty())
+                throw new Exception("No lines readen!"); //normally should never be thrown as the file is supposed to be valid
+
+            return message;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Method that return the content of the emails file into an ArrayList
+     *
+     * @param fileToConvert the file to convert
+     * @return the data on an ArrayList or null
+     */
+    private ArrayList<String> readEmails(File fileToConvert) throws MyFileException {
+        try {
+            return new FileManager(fileToConvert.getAbsolutePath()).readAll();
+        } catch (MyFileException ex) {
+            return null;
+        }
     }
 
     /**
