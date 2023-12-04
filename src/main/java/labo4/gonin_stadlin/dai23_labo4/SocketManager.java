@@ -29,8 +29,13 @@ public class SocketManager {
 
         try {
             connect();
-            //TODO call hello, or another test method to the server to validate the connection
-            disconnect();
+            if(isReadFine()){
+                out.println("quit");
+                out.flush();
+                disconnect();
+            }else{
+                throw new RuntimeException("Impossible to connect");
+            }
         } catch (IOException ex) {
             if (isConnected())
                 try {
@@ -58,7 +63,6 @@ public class SocketManager {
         out.flush();
         out.close();
         out = null;
-
         socket.close();
         socket = null;
     }
@@ -91,8 +95,11 @@ public class SocketManager {
         while(groupSize < 2){
             groupSize = victims.size() / (--nbGroups);
         }
+        int normalGroups = nbGroups * (groupSize + 1) - victims.size();
+        int decallage = 0;
         for(int i = 0; i < nbGroups; ++i){
-            if (!sendMail(victims.subList(i * groupSize, (i + 1) * groupSize), messages.get(3 * i), messages.get(3 * i + 1))) return false;
+            if(!sendMail(victims.subList(i * groupSize + decallage, (i + 1) * (groupSize) + (i < normalGroups ? 0 : 1) + decallage), messages.get(2 * i % messages.size()), messages.get((2 * i + 1) % messages.size()))) return false;
+            if(i >= normalGroups) ++decallage;
         }
         return true;
     }
@@ -134,7 +141,7 @@ public class SocketManager {
             out.flush();
             out.println("Subject: " + subject + RN);
             out.flush();
-            out.println(content);
+            out.println(content.replace("\\n", "\n"));
             out.flush();
             out.println(RN + ".");
             out.flush();
