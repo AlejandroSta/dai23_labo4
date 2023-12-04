@@ -92,12 +92,12 @@ public class SocketManager {
             groupSize = victims.size() / (--nbGroups);
         }
         for(int i = 0; i < nbGroups; ++i){
-            if (!sendMail(victims.subList(i * groupSize, (i + 1) * groupSize), messages.get(i))) return false;
+            if (!sendMail(victims.subList(i * groupSize, (i + 1) * groupSize), messages.get(3 * i), messages.get(3 * i + 1))) return false;
         }
         return true;
     }
 
-    boolean sendMail(List<String> victims, String content){
+    boolean sendMail(List<String> victims, String subject, String content){
         try {
             connect();
             if(!isReadFine()) return false;
@@ -132,7 +132,7 @@ public class SocketManager {
             };
             out.println("Date : " + dtf.format(LocalDateTime.now()).replace(",", daySuffix + ","));
             out.flush();
-            out.println("Subject: April Joke" + RN);
+            out.println("Subject: " + subject + RN);
             out.flush();
             out.println(content);
             out.flush();
