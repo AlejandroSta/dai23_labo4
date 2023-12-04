@@ -97,9 +97,11 @@ public class App extends Application {
 
     @FXML
     public void onConfigButtonClick(ActionEvent actionEvent) {
-        //victims
+        victims = null;
+        messages = null;
         File directory = new File(USER_HOME.getAbsolutePath() + "\\Documents\\");
 
+        //victims
         File fVictims = Popups.askFile("Victims list", "Indicate the file containing the list of e-mails addresses who describe the victim list.",
                 getOptions("Victims list file", directory, EXTENSION_FILTER_LIST.subList(0, 2), 1));
 
@@ -109,11 +111,9 @@ public class App extends Application {
             return;
         }
 
-        try {
-            victims = readEmails(fVictims);
-        } catch (MyFileException e) {
-            Popups.error("Error", "An error occurred while reading the victims email list file");
-        }
+        victims = readEmails(fVictims);
+
+        if (victims == null) Popups.error("Error", "An error occurred while reading the victims email list file");
 
         //Messages
         File fMessages = Popups.askFile("Messages list", "Indicate the file containing the list of subjects and body to send.",
@@ -123,11 +123,8 @@ public class App extends Application {
             return;
         }
 
-        try {
-            messages = fileToList(fMessages);
-        } catch (MyFileException e) {
-            Popups.error("Error", "An error occurred while reading the emails content file");
-        }
+        messages = readMessages(fMessages);
+        if (messages == null) Popups.error("Error", "An error occurred while reading the emails content file");
 
         //nbOfGroups
         nbGroups = Popups.askElInAList("Choose numbers of groups.", "Choose the number of groups you needs.", "One groups is composed of 2 to 5 victims who one is the sender of the email and the others the recievers.",
@@ -242,7 +239,7 @@ public class App extends Application {
      * @param fileToConvert the file to convert
      * @return the data on an ArrayList or null
      */
-    private ArrayList<String> readEmails(File fileToConvert) throws MyFileException {
+    private ArrayList<String> readEmails(File fileToConvert) {
         try {
             return new FileManager(fileToConvert.getAbsolutePath()).readAll();
         } catch (MyFileException ex) {
