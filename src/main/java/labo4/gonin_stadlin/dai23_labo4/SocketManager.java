@@ -72,7 +72,7 @@ public class SocketManager {
         return socket != null && in != null && out != null;
     }
 
-    boolean isReadFine(){
+    private boolean isReadFine(){
         String data;
         do {
             try {
@@ -116,7 +116,7 @@ public class SocketManager {
         return true;
     }
 
-    boolean sendMail(String sender, List<String> victims, HashMap<String, String> message){
+    private boolean sendMail(String sender, List<String> victims, HashMap<String, String> message){
         try {
             connect();
             if(!isReadFine()) return false;
@@ -134,7 +134,7 @@ public class SocketManager {
             out.println("data");
             out.flush();
             if(in.readLine().charAt(0) != '3') return false;
-            out.println("From: <shakira@music.com>");
+            out.println("From: <" + victims.get(0) + ">");
             StringBuilder to = new StringBuilder().append("To: ");
             for(int i = 1; i < victims.size(); ++i){
                 to.append("<").append(victims.get(i)).append(">,");
