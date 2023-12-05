@@ -10,7 +10,7 @@ The programm is very straightforward, it will first ask you to provide the email
 
 ## Instructions
 
-Except for what has already been said, it is to note that the first email of a group is the one used to connect to the mail server, also by default the sender that the receiver emails will see is shakira@music.com.
+Except for what has already been said, it is to note that the first email of a file is the one used to connect to the mail server, then the first email of each group will be the one used to fill the "from" field.
 
 ## Implementation
 
