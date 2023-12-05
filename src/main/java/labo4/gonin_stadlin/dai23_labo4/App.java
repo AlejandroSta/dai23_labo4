@@ -16,6 +16,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Constants.APP_TITLE;
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Constants.FXML_PATH;
@@ -65,7 +66,8 @@ public class App extends Application {
     @FXML
     private TextArea txa_message;
 
-    private ArrayList<String> victims, messages;
+    private HashMap<String, ArrayList<String>> victims;
+    private ArrayList<HashMap<String, String>> messages;
 
     private Integer nbGroups;
 
@@ -212,8 +214,8 @@ public class App extends Application {
      * @param fileToConvert the file to convert
      * @return the data on an ArrayList or null
      */
-    private ArrayList<String> readMessages(File fileToConvert) {
-        ArrayList<String> message = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> readMessages(File fileToConvert) {
+        ArrayList<HashMap<String, String>> message = new ArrayList<>();
         try {
             FileManager fm = new FileManager(fileToConvert.getAbsolutePath());
 
@@ -221,7 +223,11 @@ public class App extends Application {
             ArrayList<String> lines;
             while (!(lines = fm.reads(i, 2)).isEmpty()) {
                 i += 3;
-                message.addAll(lines);
+
+                HashMap<String, String> hm = new HashMap<>();
+                hm.put("Subject", lines.get(0));
+                hm.put("Body", lines.get(1));
+                message.add(hm);
             }
 
             if (message.isEmpty())
@@ -239,9 +245,17 @@ public class App extends Application {
      * @param fileToConvert the file to convert
      * @return the data on an ArrayList or null
      */
-    private ArrayList<String> readEmails(File fileToConvert) {
+    private HashMap<String, ArrayList<String>> readEmails(File fileToConvert) {
         try {
-            return new FileManager(fileToConvert.getAbsolutePath()).readAll();
+            ArrayList<String> emails = new FileManager(fileToConvert.getAbsolutePath()).readAll();
+            HashMap<String, ArrayList<String>> hm = new HashMap<>();
+            ArrayList<String> sender = new ArrayList<>();
+            sender.add(emails.get(0));
+            emails.remove(0);
+            hm.put("Sender", sender);
+            hm.put("Others", emails);
+
+            return hm;
         } catch (MyFileException ex) {
             return null;
         }
@@ -254,13 +268,24 @@ public class App extends Application {
      * @param messages the list of messages got to display
      * @param nbGroups the number of groups chosen by the user
      */
-    private void initTabPrepare(ArrayList<String> victims, ArrayList<String> messages, Integer nbGroups) {
+    private void initTabPrepare(HashMap<String, ArrayList<String>> victims, ArrayList<HashMap<String, String>> messages, Integer nbGroups) {
         lv_victims.setOnMouseClicked(mouseEvent -> txa_victim.setText(lv_victims.getSelectionModel().getSelectedItem()));
         lv_messages.setOnMouseClicked(mouseEvent -> txa_message.setText(lv_messages.getSelectionModel().getSelectedItem()));
 
-        lv_victims.getItems().addAll(victims);
-        lv_messages.getItems().addAll(messages);
+        lv_victims.getItems().add("[Sender] "+victims.get("Sender").get(0));
+        lv_victims.getItems().addAll(victims.get("Others"));
+        lv_messages.getItems().addAll(getMessagesDisplayable(messages));
 
         l_nbGroups.setText("Number of groups : " + nbGroups);
+    }
+
+    private ArrayList<String> getMessagesDisplayable(ArrayList<HashMap<String, String>> messages) {
+        ArrayList<String> res = new ArrayList<>();
+
+        for(HashMap<String, String> message : messages) {
+            res.add("Subject :\n" + message.get("Subject") + "\n\n" + "Body :\n" + message.get("Body"));
+        }
+
+        return res;
     }
 }

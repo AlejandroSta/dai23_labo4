@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 import static labo4.gonin_stadlin.dai23_labo4.helpers.Constants.*;
@@ -84,34 +85,45 @@ public class SocketManager {
         return true;
     }
 
-    boolean sendSpam(ArrayList<String> victims, ArrayList<String> messages, int nbGroups) {
-        if(victims.size() == 1) return false;
-        int groupSize = victims.size() / nbGroups;
-        if(groupSize < 2){
+    boolean sendSpam(HashMap<String, ArrayList<String>> victims, ArrayList<HashMap<String, String>> messages, int nbGroups) {
+        int victimsSize = victims.get("Others").size();
+        if(victimsSize == 0) return false;
+
+        int groupSize = victimsSize / nbGroups;
+
+        if(groupSize < 1){
             Popups.warn("Mauvais ratio nombre d'emails / nombre de groupes", "Le nombre d'emails donnés est trop petit comparé au nombre de groupes demandés (il faut au minimum deux emails par groupe)");
             boolean c = Popups.ask("Continuer ?", "Voulez-vous continuer ?", "Nous pouvons réduire le nombre de groupes automatiquement si vous le souhaitez");
+
             if(!c) return false;
+
+            while(groupSize < 1){
+                groupSize = victimsSize / (--nbGroups);
+            }
         }
-        while(groupSize < 2){
-            groupSize = victims.size() / (--nbGroups);
-        }
-        int normalGroups = nbGroups * (groupSize + 1) - victims.size();
+
+        int normalGroups = nbGroups * (groupSize + 1) - victimsSize;
         int decallage = 0;
         for(int i = 0; i < nbGroups; ++i){
-            if(!sendMail(victims.subList(i * groupSize + decallage, (i + 1) * (groupSize) + (i < normalGroups ? 0 : 1) + decallage), messages.get(2 * i % messages.size()), messages.get((2 * i + 1) % messages.size()))) return false;
+            if(!sendMail(victims.get("Sender").get(0),
+                    victims.get("Others").subList(i * groupSize + decallage,
+                    (i + 1) * (groupSize) + (i < normalGroups
+                            ? 0
+                            : 1) + decallage),
+                    messages.get(i))) return false;
             if(i >= normalGroups) ++decallage;
         }
         return true;
     }
 
-    boolean sendMail(List<String> victims, String subject, String content){
+    boolean sendMail(String sender, List<String> victims, HashMap<String, String> message){
         try {
             connect();
             if(!isReadFine()) return false;
             out.println("ehlo " + srvAddr);
             out.flush();
             if(!isReadFine()) return false;
-            out.println("mail from:<" + victims.get(0) + ">");
+            out.println("mail from:<" + sender + ">");
             out.flush();
             if(!isReadFine()) return false;
             for(int i = 1; i < victims.size(); ++i){
@@ -139,9 +151,9 @@ public class SocketManager {
             };
             out.println("Date : " + dtf.format(LocalDateTime.now()).replace(",", daySuffix + ","));
             out.flush();
-            out.println("Subject: " + subject + RN);
+            out.println("Subject: " + message.get("Subject") + RN);
             out.flush();
-            out.println(content.replace("\\n", "\n"));
+            out.println(message.get("Body").replace("\\n", "\n"));
             out.flush();
             out.println(RN + ".");
             out.flush();
