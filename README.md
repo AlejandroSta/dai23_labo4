@@ -16,6 +16,10 @@ Except for what has already been said, it is to note that the first email of a f
 
 The programm is mainly divided in four parts.
 
+### UML diagramm
+
+![UML diagramm](./ClassDiagram.bmp)
+
 ### App
 
 This file is the one to be executed, it will handle every needed process, as well as read and check if the provided files have the right format.
