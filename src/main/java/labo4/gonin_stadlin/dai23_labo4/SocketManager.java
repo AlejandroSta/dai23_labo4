@@ -85,7 +85,7 @@ public class SocketManager {
         return true;
     }
 
-    boolean sendSpam(HashMap<String, ArrayList<String>> victims, ArrayList<HashMap<String, String>> messages, int nbGroups) {
+    public boolean sendSpam(HashMap<String, ArrayList<String>> victims, ArrayList<HashMap<String, String>> messages, int nbGroups) {
         int victimsSize = victims.get("Others").size();
         if(victimsSize == 0) return false;
 
@@ -166,18 +166,5 @@ public class SocketManager {
             return false;
         }
         return true;
-    }
-
-    private String errnumString(int errnum) {
-        return switch (errnum) {
-            default -> "not specified : various unknowns errors";
-            case 1 -> "not an operation : the operation ask by the client is not valid.";
-            case 2 -> "Illegal amount of parameter : Too least or too many parameters given.";
-            case 3 ->
-                    "not a number : At least one of the parameter who need to be convertible to double is not convertible.";
-            case 4 -> "Illegal move : division by 0, square root of a negative number, ...";
-            case 5 ->
-                    "Internal errors : various errors that happened on the server side, as an example : the result is too big to be stock in a double.";
-        };
     }
 }
