@@ -110,7 +110,7 @@ public class SocketManager {
                     (i + 1) * (groupSize) + (i < normalGroups
                             ? 0
                             : 1) + decallage),
-                    messages.get(i))) return false;
+                    messages.get(i % messages.size()))) return false;
             if(i >= normalGroups) ++decallage;
         }
         return true;
